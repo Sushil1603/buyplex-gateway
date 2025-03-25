@@ -4,8 +4,8 @@ import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { Product } from '@/lib/products';
 import { ShoppingCart } from 'lucide-react';
-import { toast } from 'sonner';
 import { Link } from 'react-router-dom';
+import { useCart } from '@/contexts/CartContext';
 
 interface ProductCardProps {
   product: Product;
@@ -14,11 +14,12 @@ interface ProductCardProps {
 
 const ProductCard = ({ product, index = 0 }: ProductCardProps) => {
   const [isHovered, setIsHovered] = useState(false);
+  const { addToCart } = useCart();
   
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault(); // Prevent navigating to product detail
     e.stopPropagation(); // Prevent event bubbling
-    toast.success(`${product.name} added to cart!`);
+    addToCart(product);
   };
   
   return (

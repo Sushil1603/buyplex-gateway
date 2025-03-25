@@ -3,13 +3,16 @@ import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { getProductById } from '@/lib/products';
-import { ArrowLeft, ShoppingCart } from 'lucide-react';
-import { toast } from 'sonner';
+import { ArrowLeft, ShoppingCart, Plus, Minus } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useCart } from '@/contexts/CartContext';
+import { Button } from '@/components/ui/button';
 
 const ProductDetail = () => {
   const { productId } = useParams<{ productId: string }>();
   const [activeImage, setActiveImage] = useState<string | null>(null);
+  const [quantity, setQuantity] = useState(1);
+  const { addToCart } = useCart();
   
   const product = getProductById(productId || '');
   
@@ -24,9 +27,12 @@ const ProductDetail = () => {
   
   const handleAddToCart = () => {
     if (product) {
-      toast.success(`${product.name} added to cart!`);
+      addToCart(product, quantity);
     }
   };
+
+  const incrementQuantity = () => setQuantity(prev => prev + 1);
+  const decrementQuantity = () => setQuantity(prev => prev > 1 ? prev - 1 : 1);
   
   if (!product) {
     return (
@@ -116,7 +122,33 @@ const ProductDetail = () => {
           <p className="text-foreground/70 mb-8">{product.description}</p>
           
           <div className="space-y-6">
-            {/* Quantity selector would go here in a real app */}
+            {/* Quantity selector */}
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-medium">Quantity:</span>
+              <div className="flex items-center">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="h-8 w-8 rounded-r-none"
+                  onClick={decrementQuantity}
+                  disabled={quantity <= 1}
+                >
+                  <Minus className="h-3 w-3" />
+                </Button>
+                <div className="h-8 px-4 flex items-center justify-center border-y border-input">
+                  {quantity}
+                </div>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="h-8 w-8 rounded-l-none"
+                  onClick={incrementQuantity}
+                >
+                  <Plus className="h-3 w-3" />
+                </Button>
+              </div>
+            </div>
+            
             <div className="flex flex-col sm:flex-row gap-4">
               <button
                 onClick={handleAddToCart}
